@@ -85,7 +85,8 @@ def refresh_thermometers(therms):
 def post_to_api(data):
     now_time_epoch = calendar.timegm(datetime.now().timetuple())
     for thermometer in data['therm_details']:
-        webint.add_temp({'therm':1,'datetime':now_time_epoch,'ftemp':thermometer['therm_temp']})
+
+        webint.add_temp({'therm':thermometer["therm_name"],'datetime':now_time_epoch,'ftemp':thermometer['therm_temp']})
 
 
 

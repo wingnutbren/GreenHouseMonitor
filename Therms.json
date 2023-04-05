@@ -1,11 +1,16 @@
 {
     "therm_details": [
         {
-            "therm_name" : "Indoor",
+            "therm_name" : "1",
             "path_to_file" : "~/GreenHouseFakeData/w1_slave",
             "monitor_me" : "True",
             "temp_max" : 80,
             "temp_min" : 45
+        },
+        {
+            "therm_name" : "2",
+            "path_to_file" : "~/GreenHouseFakeData/w2_slave",
+            "monitor_me" : "False"
         }
 
     ],

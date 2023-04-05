@@ -23,5 +23,6 @@ def rewriteFile(path):
 
 while(True):
     rewriteFile("~/GreenHouseFakeData/w1_slave")
+    rewriteFile("~/GreenHouseFakeData/w2_slave")
     time.sleep(50)
 
