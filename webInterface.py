@@ -30,9 +30,9 @@ class webi:
         r = self.client.post(self.baseurl+"AddTherm",payload)
         # print(r.text)
 
-    def get_a_therm(self,mac,therm_name):
+    def get_a_therm(self,mac,plain_name):
         #Get
-        rj = self.client.get(self.baseurl+"ATherm",params={ 'mac' : mac, 'plain_name' : therm_name })
+        rj = self.client.get(self.baseurl+"ATherm",params={ 'mac' : mac, 'plain_name' : plain_name })
         r = dict()
         r = rj.json()
         if('noresults' in r.keys()):
