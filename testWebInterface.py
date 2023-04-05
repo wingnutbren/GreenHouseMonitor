@@ -10,22 +10,22 @@ url = "http://localhost:9091/dbinterract/"
 
 class TestWebStuff(unittest.TestCase):
     
-    # def test_nothing(self):
-    #     self.assertTrue(True)
-    #     self.assertFalse(False)
+    def test_nothing(self):
+        self.assertTrue(True)
+        self.assertFalse(False)
 
-    # def test_website_responds(self):
-    #     webint = webi(url)
-    #     r = webint.get_any_response()
-    #     print(r)
+    def test_website_responds(self):
+        webint = webi(url)
+        r = webint.get_any_response()
+        print(r)
 
-    # def test_GetAllTherms(self):
-    #     webint = webi(url)
-    #     therm_list= webint.get_all_therms()
-    #     # print(f"GetAllTherms...{len(therm_list)} items")
-    #     # for t in therm_list:
-    #     #     print(t['plain_name'])
-    #     self.assertTrue(len(therm_list) > 0)
+    def test_GetAllTherms(self):
+        webint = webi(url)
+        therm_list= webint.get_all_therms()
+        # print(f"GetAllTherms...{len(therm_list)} items")
+        # for t in therm_list:
+        #     print(t['plain_name'])
+        self.assertTrue(len(therm_list) > 0)
     
     def test_GetATherm(self):
         # #First make sure we can make a call when there are no matching thermomerters. We'll use this a lot
@@ -36,7 +36,7 @@ class TestWebStuff(unittest.TestCase):
         #Now pull one that's for sure in the DB
         therm_list= webint.get_all_therms()
         q_therm=therm_list[0]
-        my_therm = webint.get_a_therm(therm_name=q_therm.plain_name,mac=q_therm.device_mac)
+        my_therm = webint.get_a_therm(plain_name=q_therm.plain_name,mac=q_therm.device_mac)
         self.assertEqual(my_therm.device_mac, q_therm.device_mac)
         self.assertEqual(my_therm.plain_name, q_therm.plain_name)
 
