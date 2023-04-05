@@ -1,0 +1,6 @@
+Module, testWebInterface, needs better test_website_responds() method
+    The 'test_website_responds()' method is silly because to init the class, a call is already made to a known form that has a csrf token.  If an invalid url is given, the init method throws since the 404 will not have a csrf token included in the response
+
+Testing Wrong
+    the test cases are under 'test' subdir, but the classes to test are above. Running from the Test directory and importing .. works, but I can't get the debugger to work in that state.
+
