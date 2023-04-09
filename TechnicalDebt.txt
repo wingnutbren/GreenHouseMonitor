@@ -4,3 +4,10 @@ Module, testWebInterface, needs better test_website_responds() method
 Testing Wrong
     the test cases are under 'test' subdir, but the classes to test are above. Running from the Test directory and importing .. works, but I can't get the debugger to work in that state.
 
+No PUT
+    webinterface should use put instead of post
+
+No JSON payload 
+    webinterface should use json=payload instead of payload
+
+module name and class name 'thermometer is confusing. Consider refactoring class name with captials

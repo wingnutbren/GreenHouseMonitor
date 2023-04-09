@@ -16,6 +16,8 @@ import sys
 import os
 import json
 import signal
+from thermometer import thermometer
+import uuid
 
 # import uuid
 
@@ -58,10 +60,10 @@ def sigint_handler(signal, frame):
 
 #Access the thermometer dictionary and read the 'files' associated with each one to 
 #determine the current temperature in celcius
-def read_temp_celcius(thermometer):
-    therm_file = os.path.expanduser(thermometer['path_to_file'])
+def read_temp_celcius(th):
+    therm_file = os.path.expanduser(th.path_to_file)
     if (not exists (therm_file) ):
-            raise Exception(f"Can't find file:{thermometer['path_to_file']}") #can't read the file, throw exception
+            raise Exception(f"Can't find file:{th.path_to_file}") #can't read the file, throw exception
     therm_file = open(therm_file,"r")
     contents = therm_file.read()
     #the contents of the thermostat file will look something like this:
@@ -73,20 +75,31 @@ def read_temp_celcius(thermometer):
 
 #Access the thermometer dictionary and read the 'files' associated with each one to 
 #determine the current temperature.  return the temperature in fahrenheit
-def read_temp_fahrenheit(thermometer):
-    return read_temp_celcius(thermometer) * 1.8 + 32
+def read_temp_fahrenheit(th):
+    return read_temp_celcius(th) * 1.8 + 32
 
-def refresh_thermometers(therms):
-    #iterate through Thermometers
-    for thermometer in therms:
-        thermometer['therm_temp'] = round(read_temp_fahrenheit(thermometer),2)
-        log_output(thermometer['therm_name']+": "+str(thermometer['therm_temp'])+"\n")
+def refresh_thermometers(therms:list):
+    #iterate through Thermometers, populating their current temp
+    for th in therms:
+        th.current_temp = round(read_temp_fahrenheit(th),2)
+        log_output(th.plain_name +": "+str(th.current_temp)+"\n")
 
-def post_to_api(data):
+def build_thermometers(datadict:dict):
+    all_thermometers = []
+    mac = hex(uuid.getnode())
+    print(mac)
+    for t_json in data['therm_details']:
+        t=thermometer(t_json['therm_name'],mac,t_json['monitor_me'])
+        t.path_to_file = t_json['path_to_file']
+        all_thermometers.append(t)
+        
+    return all_thermometers
+
+
+def post_to_api(thermometers):
     now_time_epoch = calendar.timegm(datetime.now().timetuple())
-    for thermometer in data['therm_details']:
-
-        webint.add_temp({'therm':thermometer["therm_name"],'datetime':now_time_epoch,'ftemp':thermometer['therm_temp']})
+    for th in thermometers:
+        webint.add_temp({'therm':th.plain_name,'datetime':now_time_epoch,'ftemp':th.current_temp})
 
 
 
@@ -102,6 +115,9 @@ data['fan_state'] = 0
 #close the file
 thermFile.close 
 
+thermometers = build_thermometers(data);
+
+
 #Say what to do when someone presses Ctrl+C
 signal.signal(signal.SIGINT,sigint_handler)
 signal.signal(signal.SIGTERM,sigint_handler)
@@ -116,8 +132,8 @@ try:
     while(True):
         log_output("Launching Thermostat Control . . .")
         webint = webInterface.webi(data['api_base_url'])
-        refresh_thermometers(data['therm_details'])
-        post_to_api(data)
+        refresh_thermometers(thermometers)
+        post_to_api(thermometers)
         time.sleep(float(data['check_freq_seconds']))
 
 except Exception as ex:

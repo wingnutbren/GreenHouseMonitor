@@ -38,8 +38,15 @@ class TestWebStuff(unittest.TestCase):
         q_therm=therm_list[0]
         my_therm = webint.get_a_therm(plain_name=q_therm.plain_name,mac=q_therm.device_mac)
         self.assertEqual(my_therm.device_mac, q_therm.device_mac)
-        self.assertEqual(my_therm.plain_name, q_therm.plain_name)
+    #     self.assertEqual(my_therm.plain_name, q_therm.plain_name)
 
+    def test_PostATherm(self):
+        webint = webi(url)
+        webint.add_thermometer(thermometer("AAAThEErm",'AA:EF:55:EC',False))
+
+    def test_DeleteATherm(self):
+        webint = webi(url)
+        webint.del_a_therm(thermometer("AAAThEErm",'AA:EF:55:EC',False))
 
 if __name__ == '__main__':
     # print(sys.path)

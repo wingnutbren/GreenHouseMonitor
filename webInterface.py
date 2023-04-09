@@ -21,25 +21,30 @@ class webi:
     def add_temp (self,payload):
         #Post
         payload["csrfmiddlewaretoken"]=self.crsftoken
-        r = self.client.post(self.baseurl+"AddTemps",payload)
+        r = self.client.post(self.baseurl+"AddTemp",payload)
         # print(r.text)
 
-    def add_thermometer(self,payload):
+    def add_thermometer(self,therm:thermometer):
         #Post
+        payload = therm.as_payload_dict()
         payload["csrfmiddlewaretoken"]=self.crsftoken
+
         r = self.client.post(self.baseurl+"AddTherm",payload)
-        # print(r.text)
 
     def get_a_therm(self,mac,plain_name):
         #Get
         rj = self.client.get(self.baseurl+"ATherm",params={ 'mac' : mac, 'plain_name' : plain_name })
         r = dict()
-        r = rj.json()
+        therm = rj.json()
         if('noresults' in r.keys()):
             return None
         else:
-            return thermometer(r['plain_name'],r['mac'],False)        
+            return thermometer(therm['plain_name'],therm['mac'],False)        
 
+    def del_a_therm(self,therm: thermometer):
+        self.client.delete(self.baseurl+f"DeleteThermByNameMac/{therm.plain_name}/{therm.device_mac}")
+        print('done')
+        
 
     def get_all_therms(self):
         #Get
@@ -57,6 +62,8 @@ class webi:
         # therms = json.loads(json.loads(r.text))
         # return therms
  
+       
+
         
 
     #Used for testing. Make sure the URL answers
