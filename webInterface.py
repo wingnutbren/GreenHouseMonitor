@@ -27,8 +27,11 @@ class webi:
         #Post
         payload = therm.as_payload_dict()
         payload["csrfmiddlewaretoken"]=self.csrftoken
+        payload["json"]="true"
 
         r = self.client.post(self.baseurl+"AddTherm",payload)
+        id_dict = r.json()
+        return id_dict['id']
 
     def get_a_therm(self,mac,plain_name):
         #Get
@@ -37,7 +40,9 @@ class webi:
         if('noresults' in therm.keys()):
             return None
         else:
-            return thermometer(therm['plain_name'],therm['mac'],False)        
+            t=thermometer(therm['plain_name'],therm['mac'],False)  
+            t.id = therm['id']    
+            return t
 
     def del_a_therm(self,therm: thermometer):
         data={'csrfmiddlewaretoken':self.csrftoken}

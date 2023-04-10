@@ -87,7 +87,6 @@ def refresh_thermometers(therms:list):
 def build_thermometers(datadict:dict):
     all_thermometers = []
     mac = hex(uuid.getnode())
-    print(mac)
     for t_json in data['therm_details']:
         t=thermometer(t_json['therm_name'],mac,t_json['monitor_me'])
         t.path_to_file = t_json['path_to_file']
@@ -99,7 +98,15 @@ def build_thermometers(datadict:dict):
 def post_to_api(thermometers):
     now_time_epoch = calendar.timegm(datetime.now().timetuple())
     for th in thermometers:
-        webint.add_temp({'therm':th.plain_name,'datetime':now_time_epoch,'ftemp':th.current_temp})
+        if th.id == None:
+            #get or add it first
+            db_therm = webint.get_a_therm(th.device_mac,th.plain_name)
+            if db_therm == None:
+                th.id = webint.add_thermometer(th)
+            else:
+                th.id = db_therm.id
+        
+        webint.add_temp({'therm':th.id,'datetime':now_time_epoch,'ftemp':th.current_temp})
 
 
 
@@ -121,11 +128,6 @@ thermometers = build_thermometers(data);
 #Say what to do when someone presses Ctrl+C
 signal.signal(signal.SIGINT,sigint_handler)
 signal.signal(signal.SIGTERM,sigint_handler)
-# # print (hex(uuid.getnode()))
-
-    # now_time_epoch = calendar.timegm(datetime.now().timetuple())
-    # webint.add_temp({'therm':1,'datetime':now_time_epoch,'ftemp':83.7,})
-
 
 #abort_if_another_running()
 try:

@@ -56,7 +56,7 @@ class TestWebStuff(unittest.TestCase):
         print("test_DeleteATherm")
         rando = {random.randrange(100)}
         webint = webi(url)
-        webint.add_thermometer(thermometer(f"AAAThEErm{rando}",'AA:EF:55:EC',False))
+        newid  = webint.add_thermometer(thermometer(f"AAAThEErm{rando}",'AA:EF:55:EC',False))
         webint.del_a_therm(thermometer(f"AAAThEErm{rando}",'AA:EF:55:EC',False))
 
 if __name__ == '__main__':
