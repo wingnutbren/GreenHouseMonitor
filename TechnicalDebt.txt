@@ -10,4 +10,8 @@ No PUT
 No JSON payload 
     webinterface should use json=payload instead of payload
 
+Confusing modulename
 module name and class name 'thermometer is confusing. Consider refactoring class name with captials
+
+Bad CSRF token handling
+the home.html page has the csrf token in a form element. find another way to put this in the response

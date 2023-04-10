@@ -12,44 +12,42 @@ class webi:
         c=self.client
         #make an http get to retrieve cross site request forgery token
 
-        c.get(baseurl+"AllTherms")
+        c.get(baseurl)
         if 'csrftoken' in c.cookies:
-            self.crsftoken = c.cookies['csrftoken']
+            self.csrftoken = c.cookies['csrftoken']
         else:
-            self.crsftoken = c.cookies['csrf']
+            self.csrftoken = c.cookies['csrf']
 
     def add_temp (self,payload):
         #Post
-        payload["csrfmiddlewaretoken"]=self.crsftoken
+        payload["csrfmiddlewaretoken"]=self.csrftoken
         r = self.client.post(self.baseurl+"AddTemp",payload)
-        # print(r.text)
 
     def add_thermometer(self,therm:thermometer):
         #Post
         payload = therm.as_payload_dict()
-        payload["csrfmiddlewaretoken"]=self.crsftoken
+        payload["csrfmiddlewaretoken"]=self.csrftoken
 
         r = self.client.post(self.baseurl+"AddTherm",payload)
 
     def get_a_therm(self,mac,plain_name):
         #Get
         rj = self.client.get(self.baseurl+"ATherm",params={ 'mac' : mac, 'plain_name' : plain_name })
-        r = dict()
         therm = rj.json()
-        if('noresults' in r.keys()):
+        if('noresults' in therm.keys()):
             return None
         else:
             return thermometer(therm['plain_name'],therm['mac'],False)        
 
     def del_a_therm(self,therm: thermometer):
-        self.client.delete(self.baseurl+f"DeleteThermByNameMac/{therm.plain_name}/{therm.device_mac}")
-        print('done')
+        data={'csrfmiddlewaretoken':self.csrftoken}
+        url = self.baseurl+f"DeleteThermByNameMac/{therm.plain_name}/{therm.device_mac}"
+        self.client.post(url, data=data, headers= {'Referer': url})
         
 
     def get_all_therms(self):
         #Get
         r = self.client.get(self.baseurl+"AllTherms?json=true")
-                # print(f"GetAllTherms...{len(therm_list)} items")
         result_list = r.json()
         therm_list=list()
         for t in result_list:
@@ -69,6 +67,7 @@ class webi:
     #Used for testing. Make sure the URL answers
     def get_any_response(self):
        r = self.client.get(self.baseurl)
+       return r.status_code
        
         
 
