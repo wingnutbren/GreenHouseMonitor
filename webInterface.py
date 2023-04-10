@@ -12,39 +12,47 @@ class webi:
         c=self.client
         #make an http get to retrieve cross site request forgery token
 
-        c.get(baseurl+"AllTherms")
+        c.get(baseurl)
         if 'csrftoken' in c.cookies:
-            self.crsftoken = c.cookies['csrftoken']
+            self.csrftoken = c.cookies['csrftoken']
         else:
-            self.crsftoken = c.cookies['csrf']
+            self.csrftoken = c.cookies['csrf']
 
     def add_temp (self,payload):
         #Post
-        payload["csrfmiddlewaretoken"]=self.crsftoken
-        r = self.client.post(self.baseurl+"AddTemps",payload)
-        # print(r.text)
+        payload["csrfmiddlewaretoken"]=self.csrftoken
+        r = self.client.post(self.baseurl+"AddTemp",payload)
 
-    def add_thermometer(self,payload):
+    def add_thermometer(self,therm:thermometer):
         #Post
-        payload["csrfmiddlewaretoken"]=self.crsftoken
-        r = self.client.post(self.baseurl+"AddTherm",payload)
-        # print(r.text)
+        payload = therm.as_payload_dict()
+        payload["csrfmiddlewaretoken"]=self.csrftoken
+        payload["json"]="true"
 
-    def get_a_therm(self,mac,therm_name):
+        r = self.client.post(self.baseurl+"AddTherm",payload)
+        id_dict = r.json()
+        return id_dict['id']
+
+    def get_a_therm(self,mac,plain_name):
         #Get
-        rj = self.client.get(self.baseurl+"ATherm",params={ 'mac' : mac, 'plain_name' : therm_name })
-        r = dict()
-        r = rj.json()
-        if('noresults' in r.keys()):
+        rj = self.client.get(self.baseurl+"ATherm",params={ 'mac' : mac, 'plain_name' : plain_name })
+        therm = rj.json()
+        if('noresults' in therm.keys()):
             return None
         else:
-            return thermometer(r['plain_name'],r['mac'],False)        
+            t=thermometer(therm['plain_name'],therm['mac'],False)  
+            t.id = therm['id']    
+            return t
 
+    def del_a_therm(self,therm: thermometer):
+        data={'csrfmiddlewaretoken':self.csrftoken}
+        url = self.baseurl+f"DeleteThermByNameMac/{therm.plain_name}/{therm.device_mac}"
+        self.client.post(url, data=data, headers= {'Referer': url})
+        
 
     def get_all_therms(self):
         #Get
         r = self.client.get(self.baseurl+"AllTherms?json=true")
-                # print(f"GetAllTherms...{len(therm_list)} items")
         result_list = r.json()
         therm_list=list()
         for t in result_list:
@@ -57,11 +65,14 @@ class webi:
         # therms = json.loads(json.loads(r.text))
         # return therms
  
+       
+
         
 
     #Used for testing. Make sure the URL answers
     def get_any_response(self):
        r = self.client.get(self.baseurl)
+       return r.status_code
        
         
 
